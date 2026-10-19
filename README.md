@@ -1,4 +1,4 @@
-# 🛒 DC Store
+## 🛒 DC Store
 
 O **DC Store** é um e-commerce desenvolvido para a venda de mangás e histórias em quadrinhos (HQs), com foco em oferecer uma experiência de navegação moderna, intuitiva e responsiva.
 
