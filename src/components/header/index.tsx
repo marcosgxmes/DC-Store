@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Link } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { FiShoppingCart, FiUser, FiLogOut, FiSearch } from "react-icons/fi";
+import { Sun, Moon } from "lucide-react";
+
 import img from "../../../public/dc_logo_gray.png";
-import { FiShoppingCart, FiUser, FiLogOut } from "react-icons/fi";
-import { FiSearch } from "react-icons/fi";
-import { useContext } from "react";
 
 import { useCarrinho } from "../../context/CarrinhoContext";
 import { useSearch } from "../../context/SeachContext";
@@ -11,100 +13,163 @@ import { CartContext } from "../../context/CartContext";
 
 export function Header() {
   const { abrirCarrinho } = useCarrinho();
-
   const { signed, loadingAuth, user } = useContext(AuthContext);
   const { cartAmount } = useContext(CartContext);
-
   const { input, setInput, handleSearchItem } = useSearch();
 
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("dc-store-theme");
+    setDarkMode(savedTheme === "dark");
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("dc-store-theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
+
+  const handleThemeToggle = () => {
+    setDarkMode((current) => {
+      const nextTheme = !current;
+
+      document.documentElement.classList.toggle("dark", nextTheme);
+
+      return nextTheme;
+    });
+  };
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleSearchItem();
+  };
+
   return (
-    <header className="w-full  z-10 md:sticky top-0 bg-white shadow-md">
-      <nav className="w-full max-w-7xl min-h-16 flex flex-col items-center justify-between mx-auto md:py-2">
-        <div className="w-full flex items-center justify-between px-4 gap-3">
+    <header className="sticky top-0 z-10 w-full bg-white shadow-md">
+      <nav className="mx-auto flex w-full max-w-7xl flex-col px-3 sm:px-5 lg:px-6">
+        {/* LINHA PRINCIPAL */}
+        <div className="flex min-h-16 w-full items-center justify-between gap-2 py-2 sm:gap-4">
           {/* LOGO */}
-          <Link to="/" className="flex gap-x-2 w-52 ">
+          <Link
+            to="/"
+            aria-label="DC Store - Página inicial"
+            className="flex w-auto min-w-0 shrink-0 items-center gap-2"
+          >
             <img
               src={img}
-              className="max-w-8 w-full object-contain mx-1 py-1.5"
-              alt="DC logo"
+              alt="Logo DC Store"
+              className="h-12 w-9 object-contain sm:h-14 sm:w-10"
             />
-            <div className="text-iconColor flex flex-col items-start justify-center px-2 font-Gow border-l border-grayText min-h-full w-full">
-              <span className="leading-none text-xl ">
-                DC <br /> STORE
-              </span>
+
+            <div className="flex min-h-9 items-center border-l border-grayText pl-2 font-Gow text-iconColor">
+              <span className="text-base leading-tight sm:text-lg md:text-xl">
+                DC
+                <br />
+                STORE
+              </span>              
             </div>
           </Link>
 
-          {/* INPUT */}
-          <section className=" hidden relative p-2 w-full max-w-3xl mx-auto md:flex justify-center items-center">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="w-full rounded-md h-9 px-3 border-none bg-bgInput outline-offset-2 outline-purple focus:outline-2"
-              placeholder="Pesquisar"
-            />
+          {/* PESQUISA DESKTOP */}
+          <form
+            onSubmit={handleSearch}
+            role="search"
+            className="mx-4 hidden w-full max-w-2xl md:flex"
+          >
+            <div className="relative w-full">
+              <input
+                type="search"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Pesquisar produtos..."
+                aria-label="Pesquisar produtos"
+                className="h-10 w-full rounded-lg border border-grayText/40 bg-bgInput px-4 pr-12 text-sm outline-none transition focus:border-purple focus:ring-2 focus:ring-purple/20"
+              />
 
-            <button
-              className="absolute h-8 right-0 pr-6"
-              onClick={handleSearchItem}
-            >
-              <FiSearch size={22} color="#707070" />
-            </button>
-          </section>
+              <button
+                type="submit"
+                aria-label="Pesquisar"
+                className="absolute right-0 top-0 flex h-10 w-11 items-center justify-center text-gray-500 transition hover:text-purple"
+              >
+                <FiSearch size={21} />
+              </button>
+            </div>
+          </form>
 
-          {/* ICONS */}
-          <div className="py-2 px-1 flex items-center justify-between gap-4">
-            {!loadingAuth && signed && (
+          {/* ÍCONES E AÇÕES */}
+          <div className="flex shrink-0 items-center justify-end gap-3 sm:gap-4 md:gap-5">
+            {/* USUÁRIO */}
+            {!loadingAuth && (
               <Link
                 to="/login"
-                className="relative flex flex-col items-center justify-center"
+                aria-label={signed ? "Sair da conta" : "Entrar na conta"}
+                title={signed ? "Sair da conta" : "Entrar"}
+                className="relative flex items-center justify-center text-iconColor transition hover:text-purple"
               >
-                <FiLogOut size={24} color="#3E31FA" />
-                <p className="absolute top-6 text-sm text-purple">
-                  {user?.name}
-                </p>
+                {signed ? <FiLogOut size={22} /> : <FiUser size={23} />}
               </Link>
             )}
 
-            {!loadingAuth && !signed && (
-              <Link to="/login" className="flex items-center justify-center gap-2">
-                <p className="text-[#607D8B]">Login</p>
-                <FiUser size={24} color="#607D8B" />
-              </Link>
-            )}
-
-            <div className="relative cursor-pointer" onClick={() => abrirCarrinho()}>
+            {/* CARRINHO */}
+            <button
+              type="button"
+              onClick={abrirCarrinho}
+              aria-label={`Abrir carrinho. ${cartAmount} itens`}
+              className="relative flex items-center justify-center text-iconColor transition hover:text-purple"
+            >
               <FiShoppingCart
-                size={24}
-                color={cartAmount != 0 ? "#3E31FA" : "#607D8B"}
+                size={23}
+                color={cartAmount > 0 ? "#3E31FA" : undefined}
               />
+
               {cartAmount > 0 && (
-                <span className="absolute -top-3 -right-2 px-2.5 bg-purple rounded-full w-5 h-5 flex items-center justify-center text-white text-xs">
-                  {cartAmount}
+                <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-purple px-1 text-[10px] font-semibold text-white">
+                  {cartAmount > 99 ? "99+" : cartAmount}
                 </span>
               )}
-            </div>
+            </button>
+
+            {/* TEMA */}
+            <button
+              type="button"
+              onClick={handleThemeToggle}
+              aria-label={darkMode ? "Ativar tema claro" : "Ativar tema escuro"}
+              aria-pressed={darkMode}
+              className="flex items-center justify-center text-iconColor transition hover:text-purple"
+            >
+              {darkMode ? (
+                <Sun size={22} aria-hidden="true" />
+              ) : (
+                <Moon size={22} aria-hidden="true" />
+              )}
+            </button>
           </div>
         </div>
 
-        {/* INPUT QUE SE ALOCA PARA BAIXA COM MENOR RESOLUÇÃO */}
-        <div className={`md:hidden w-full border-t border-grayText`}>
-          <section className="relative px-4 py-3 w-full max-w-3xl mx-auto flex justify-center items-center">
+        {/* PESQUISA MOBILE */}
+        <form
+          onSubmit={handleSearch}
+          role="search"
+          className="w-full pb-3 md:hidden"
+        >
+          <div className="relative w-full">
             <input
+              type="search"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className="w-full rounded-md h-9 px-3 outline-offset-2 outline-purple focus:outline-2 border-none bg-bgInput"
-              placeholder="Pesquisar"
+              placeholder="Pesquisar produtos..."
+              aria-label="Pesquisar produtos"
+              className="h-10 w-full rounded-lg border border-grayText/40 bg-bgInput px-3 pr-12 text-sm outline-none transition focus:border-purple focus:ring-2 focus:ring-purple/20"
             />
 
             <button
-              className="absolute h-8 right-0 pr-6"
-              onClick={handleSearchItem}
+              type="submit"
+              aria-label="Pesquisar"
+              className="absolute right-0 top-0 flex h-10 w-11 items-center justify-center text-gray-500 transition hover:text-purple"
             >
-              <FiSearch size={22} color="#707070" />
+              <FiSearch size={21} />
             </button>
-          </section>
-        </div>
+          </div>
+        </form>
       </nav>
     </header>
   );
