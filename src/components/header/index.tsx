@@ -13,7 +13,7 @@ import { CartContext } from "../../context/CartContext";
 
 export function Header() {
   const { abrirCarrinho } = useCarrinho();
-  const { signed, loadingAuth, user } = useContext(AuthContext);
+  const { signed, loadingAuth } = useContext(AuthContext);
   const { cartAmount } = useContext(CartContext);
   const { input, setInput, handleSearchItem } = useSearch();
 
