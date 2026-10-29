@@ -24,7 +24,7 @@ export default {
         purple: "#3E31FA",
         cleanPurple: "#8760f6",
         background: "#f4f3f8",
-        bgDark: "#2d3137",        
+        bgDark: "#2d3137",
         grayText: "#e2e2e2",
         bgInput: "#EDEFF2",
         iconColor: "#607D8B"

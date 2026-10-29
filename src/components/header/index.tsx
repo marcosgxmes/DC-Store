@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { FiShoppingCart, FiUser, FiLogOut, FiSearch } from "react-icons/fi";
-import { Sun, Moon } from "lucide-react";
+//import { Sun, Moon } from "lucide-react";
 
 import img from "../../../public/dc_logo_gray.png";
 
@@ -19,6 +19,7 @@ export function Header() {
 
   const [darkMode, setDarkMode] = useState(false);
 
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("dc-store-theme");
     setDarkMode(savedTheme === "dark");
@@ -28,15 +29,15 @@ export function Header() {
     localStorage.setItem("dc-store-theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
-  const handleThemeToggle = () => {
-    setDarkMode((current) => {
-      const nextTheme = !current;
+  // const handleThemeToggle = () => {
+  //   setDarkMode((current) => {
+  //     const nextTheme = !current;
 
-      document.documentElement.classList.toggle("dark", nextTheme);
+  //     document.documentElement.classList.toggle("dark", nextTheme);
 
-      return nextTheme;
-    });
-  };
+  //     return nextTheme;
+  //   });
+  // };
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -80,7 +81,7 @@ export function Header() {
                 type="search"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Pesquisar produtos..."
+                placeholder="Pesquisar..."
                 aria-label="Pesquisar produtos"
                 className="h-10 w-full rounded-lg border border-grayText/40 bg-bgInput px-4 pr-12 text-sm outline-none transition focus:border-purple focus:ring-2 focus:ring-purple/20"
               />
@@ -114,7 +115,7 @@ export function Header() {
               type="button"
               onClick={abrirCarrinho}
               aria-label={`Abrir carrinho. ${cartAmount} itens`}
-              className="relative flex items-center justify-center text-iconColor transition hover:text-purple"
+              className="relative flex items-center pr-1 justify-center text-iconColor transition hover:text-purple"
             >
               <FiShoppingCart
                 size={23}
@@ -129,7 +130,7 @@ export function Header() {
             </button>
 
             {/* TEMA */}
-            <button
+            {/* <button
               type="button"
               onClick={handleThemeToggle}
               aria-label={darkMode ? "Ativar tema claro" : "Ativar tema escuro"}
@@ -141,7 +142,7 @@ export function Header() {
               ) : (
                 <Moon size={22} aria-hidden="true" />
               )}
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -156,7 +157,7 @@ export function Header() {
               type="search"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Pesquisar produtos..."
+              placeholder="Buscar..."
               aria-label="Pesquisar produtos"
               className="h-10 w-full rounded-lg border border-grayText/40 bg-bgInput px-3 pr-12 text-sm outline-none transition focus:border-purple focus:ring-2 focus:ring-purple/20"
             />

@@ -248,7 +248,7 @@ export function ProductDetail() {
 
                         <button
                           onClick={() => handleAddItem(snap.id ? snap : product)}
-                          className="bg-gradient-to-t from-purple to-cleanPurple hover:bg-none hover:bg-purple rounded-lg flex items-center justify-center gap-2 py-2 px-8 text-white font-bold"
+                          className="bg-gradient-to-t from-purple to-cleanPurple hover:bg-none hover:bg-purple rounded-md flex items-center justify-center gap-2 py-2 px-8 text-white font-bold"
                         >
                           Adicionar
                         </button>

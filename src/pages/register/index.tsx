@@ -90,10 +90,10 @@ export function Register() {
   return (
     <Container>
       <div className="min-h-[calc(100vh-24px)] flex items-center justify-center md:p-4">
-				<main className="flex flex-col items-center justify-center py-8 w-full max-w-[600px] min-h-[700px] rounded-3xl overflow-hidden transition-all duration-300 md:shadow-2xl bg-white">
+				<main className="flex flex-col items-center justify-center md:p-8 w-full max-w-[490px] min-h-[700px] rounded-3xl overflow-hidden transition-all duration-300 md:shadow-2xl bg-white">
 					<Link
           to="/"
-          className="mb-6 max-w-[180px] w-full flex items-center justify-center"
+          className="mb-6 max-w-[200px] w-full flex items-center justify-center"
         >
           <img
             src={logoImg}

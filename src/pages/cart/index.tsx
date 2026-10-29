@@ -8,6 +8,7 @@ import { IoClose } from "react-icons/io5";
 import sad_face from "../../../public/sad-face-icon.png";
 import { useCarrinho } from "../../context/CarrinhoContext";
 
+
 export function Cart() {
 	const {
 		cart,
@@ -20,6 +21,8 @@ export function Cart() {
 	} = useContext(CartContext);
 
 	const { carrinhoAberto, fecharCarrinho } = useCarrinho();
+
+	
 
 
   // FUNÇÃO PARA FECHAR O CARRINHO
@@ -187,7 +190,7 @@ export function Cart() {
 								</div>
 
 								<div className="flex flex-1 items-center justify-center">
-									<Link className="w-full" to="/payment">
+									<Link className="w-full" to='/payment'>
 										<button
 											onClick={() => fecharCarrinho()}
 											className="w-full px-2 items-center justify-center rounded-xl border border-transparent py-3 bg-gradient-to-t from-purple to-cleanPurple text-base font-medium text-white shadow-sm hover:bg-none hover:bg-purple"

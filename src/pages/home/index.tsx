@@ -1,21 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
-import { useEffect, useState, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import toast from "react-hot-toast";
 
 import { CartContext } from "../../context/CartContext";
 import { useSearch } from "../../context/SeachContext";
-
-import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
-
-import { db } from "../../services/api";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
-
 import { Header } from "../../components/header";
 import { Loading } from "../../components/loading";
+import { db } from "../../services/api";
 
-
-// TIPAGEM DOS PRODUTOS
 export interface ProductsProps {
   id: string;
   title: string;
@@ -25,240 +18,225 @@ export interface ProductsProps {
   creator?: string;
 }
 
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
+
 export function Home() {
   const [loadedImages, setLoadedImages] = useState<string[]>([]);
-  const { quadrinhos, setQuadrinhos } = useSearch();
-  const { addItemCart, scrollToTop } = useContext(CartContext);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { quadrinhos, setQuadrinhos } = useSearch();
+  const { addItemCart, scrollToTop } = useContext(CartContext);
 
-  // CARREGAR PRODUTOS DO FIREBASE
   useEffect(() => {
-    async function getProducts() {
+    let isActive = true;
+
+    async function loadProducts() {
       try {
         setIsLoading(true);
 
-        const comicRef = collection(db, "quadrinhos");
-        const queryRef = query(comicRef, orderBy("title", "asc"));
+        const productsQuery = query(
+          collection(db, "quadrinhos"),
+          orderBy("title", "asc"),
+        );
 
-        const snapshot = await getDocs(queryRef);
+        const snapshot = await getDocs(productsQuery);
 
-        const listComic: ProductsProps[] = [];
+        const products: ProductsProps[] = snapshot.docs.map((document) => {
+          const data = document.data();
 
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-
-          listComic.push({
-            id: doc.id,
+          return {
+            id: document.id,
             title: data.title,
             description: data.description,
             price: data.price,
             cover: data.cover,
             creator: data.creator,
-          });
+          };
         });
 
-        setQuadrinhos(listComic);
+        if (isActive) {
+          setQuadrinhos(products);
+        }
       } catch (error) {
         console.error("Erro ao carregar os produtos:", error);
 
-        toast.error("Não foi possível carregar os mangás.");
+        if (isActive) {
+          toast.error("Não foi possível carregar os mangás.");
+        }
       } finally {
-        setIsLoading(false);
+        if (isActive) {
+          setIsLoading(false);
+        }
       }
     }
 
-    getProducts();
-  }, []);
+    loadProducts();
 
-  // IMAGEM CARREGADA
-  function handleImageLoad(id: string) {
-    setLoadedImages((prev) => {
-      if (prev.includes(id)) {
-        return prev;
-      }
+    return () => {
+      isActive = false;
+    };
+  }, [setQuadrinhos]);
 
-      return [...prev, id];
-    });
+  function handleImageLoad(productId: string) {
+    setLoadedImages((currentImages) =>
+      currentImages.includes(productId)
+        ? currentImages
+        : [...currentImages, productId],
+    );
   }
 
-  // ADICIONA ITEM AO CARRINHO
   function handleAddCartItem(product: ProductsProps) {
-    toast.success("Adicionado com sucesso!", {
-      style: {
-        backgroundColor: "#fff",
-        color: "#000",
-        borderRadius: 15,
-      },
-    });
-
     addItemCart(product);
+    toast.success("Mangá adicionado ao carrinho!");
   }
 
   return (
     <>
-      {isLoading && (
-        <Loading />
-      )}
-
       <Header />
 
-      <div className="min-h-screen overflow-hidden bg-gradient-to-br from-background via-background to-purple/5 pb-10">
-        <main className="relative mx-auto min-h-screen w-full max-w-7xl p-3">
-
-          {/* TÍTULO */}
-          <div className="relative  mb-6 mt-4 text-center md:mb-8">
-            <h1 className="relative font-bold text-color text-xl md:text-2xl text-center">
-              <span className="animate-fade-in-up ">
-                Explore os itens mais populares
-              </span>
-            </h1>
-          </div>
-
-          {/* PRODUTOS */}
-          <div
-            className="
-              grid
-              grid-cols-2
-              items-start
-              justify-evenly
-              gap-x-3
-              gap-y-8
-              px-2
-              sm:grid-cols-4
-              md:grid-cols-4
-              md:gap-x-8
-              lg:grid-cols-5
-              lg:gap-y-12
-            "
+      <main className="min-h-screen bg-background text-text">
+        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <section
+            aria-labelledby="home-title"
+            className="relative mb-10 overflow-hidden rounded-3xl bg-gradient-to-r from-purple to-cleanPurple px-6 py-10 text-white shadow-xl sm:px-10 sm:py-14"
           >
-            {quadrinhos.map((product, index) => {
-              const imageLoaded = loadedImages.includes(product.id);
+            <div
+              aria-hidden="true"
+              className="absolute -right-12 -top-16 h-52 w-52 rounded-full bg-white/10 blur-2xl"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute -bottom-20 right-1/4 h-48 w-48 rounded-full bg-fuchsia-300/20 blur-2xl"
+            />
 
-              return (
-                <section
-                  key={product.id}
-                  className="product-card flex h-full w-full flex-col gap-3"
-                  style={{
-                    animationDelay: `${Math.min(index * 40, 400)}ms`,
-                  }}
+            <div className="relative max-w-2xl">
+              <h1
+                id="home-title"
+                className="text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl"
+              >
+                Sua próxima aventura começa aqui
+              </h1>
+
+              <p className="mt-4 max-w-xl text-sm text-white/90 sm:text-base">
+                Explore histórias incríveis, encontre seus títulos favoritos
+                e leve um novo universo para a sua coleção.
+              </p>
+
+              <a
+                href="#mais-populares"
+                className="mt-6 inline-flex rounded-xl bg-white px-5 py-3 text-sm font-bold text-purple shadow-md transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                Explorar mangás
+              </a>
+            </div>
+          </section>
+
+          <section
+            id="mais-populares"
+            aria-labelledby="popular-title"
+            className="scroll-mt-6"
+          >
+            <header className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-purple">
+                  Escolhas dos leitores
+                </p>
+
+                <h2
+                  id="popular-title"
+                  className="mt-1 text-2xl font-extrabold text-texts sm:text-3xl"
                 >
-                  <Link
-                    to={`/product/${product.id}`}
-                    onClick={scrollToTop}
-                    className="flex flex-1 flex-col"
-                  >
-                    {/* CAPA */}
-                    <div
-                      className="
-                      group relative flex h-44 items-center justify-center
-                      overflow-hidden rounded-md bg-white
-                      sm:px-3  py-5 shadow-lg transition-shadow duration-300
-                      hover:shadow-2xl
-                      sm:h-60
-                      md:h-64 md:px-6
-                    "
+                  Mangás mais populares
+                </h2>
+              </div>
+            </header>
+
+            {isLoading ? (
+              <div className="flex justify-center py-12" aria-live="polite">
+                <Loading />
+              </div>
+            ) : quadrinhos.length === 0 ? (
+              <p className="rounded-2xl bg-white p-8 text-center text-text shadow-sm">
+                Nenhum mangá disponível no momento.
+              </p>
+            ) : (
+              <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-6 xl:grid-cols-5">
+                {quadrinhos.map((product, index) => {
+                  const imageLoaded = loadedImages.includes(product.id);
+
+                  return (
+                    <li
+                      key={product.id}
+                      className="product-card"
+                      style={{
+                        animationDelay: `${Math.min(index * 40, 400)}ms`,
+                      }}
                     >
-                      {!imageLoaded && (
-                        <div className="absolute inset-0 animate-pulse bg-slate-200 dark:bg-slate-700" />
-                      )}
-
-                      <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
-                        <img
-                          src={product.cover}
-                          alt={product.title}
-                          onLoad={() => handleImageLoad(product.id)}
-                          loading={index < 5 ? "eager" : "lazy"}
-                          decoding="async"
-                          className={`
-                          h-full w-full object-contain
-                          transition-all duration-300 ease-out
-                          ${imageLoaded ? "opacity-100" : "opacity-0"}
-                          group-hover:scale-[1.04]
-                        `}
-                        />
-                      </div>
-
-                      {/* VISUALIZAÇÃO */}
-                      <button
-                        type="button"
-                        aria-label={`Visualizar ${product.title}`}
-                        className="
-                        absolute bottom-4 right-4 rounded-full
-                        bg-white/80 p-2 opacity-0 shadow-lg backdrop-blur-sm
-                        transition-all duration-300
-                        group-hover:opacity-100 group-hover:translate-y-0
-                        hover:scale-110
-                      "
+                      <article
+                        aria-labelledby={`product-title-${product.id}`}
+                        className="flex h-full flex-col rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-4"
                       >
-                        <svg
-                          className="h-5 w-5 text-purple"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                        <Link
+                          to={`/product/${product.id}`}
+                          onClick={scrollToTop}
+                          className="group rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                          />
-                        </svg>
-                      </button>
-                    </div>
+                          <div className="relative flex aspect-[3/4] max-h-72 items-center justify-center overflow-hidden rounded-xl bg-slate-100 p-3 sm:p-4">
+                            {!imageLoaded && (
+                              <div
+                                aria-hidden="true"
+                                className="absolute inset-0 animate-pulse bg-gradient-to-br from-purple/10 via-fuchsia-100 to-orange-100"
+                              />
+                            )}
 
-                    {/* TÍTULO */}
-                    <p
-                      className="
-                      mt-3 min-h-[2.75rem]
-                      line-clamp-2 text-center text-sm font-bold text-text
-                      transition-colors duration-300 group-hover:text-purple
-                    "
-                    >
-                      {product.title}
-                    </p>
-                  </Link>
+                            <img
+                              src={product.cover}
+                              alt={`Capa de ${product.title}`}
+                              onLoad={() => handleImageLoad(product.id)}
+                              loading={index < 4 ? "eager" : "lazy"}
+                              decoding="async"
+                              className={`relative h-full w-full object-contain transition duration-300 group-hover:scale-105 ${
+                                imageLoaded ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                          </div>
 
-                  {/* PREÇO + BOTÃO */}
-                  <div className="mt-auto flex w-full flex-col gap-2">
-                    <div className="w-full text-center sm:text-left">
-                      <strong className="font-Roboto text-base md:text-lg">
-                        {product.price.toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        })}
-                      </strong>
-                    </div>
+                          <h3
+                            id={`product-title-${product.id}`}
+                            className="mt-3 line-clamp-2 min-h-10 text-center text-sm font-bold text-texts transition-colors group-hover:text-purple sm:text-base"
+                          >
+                            {product.title}
+                          </h3>
+                        </Link>
 
-                    <button
-                      type="button"
-                      onClick={() => handleAddCartItem(product)}
-                      className="
-                      w-full rounded-lg
-                      bg-gradient-to-t from-purple to-cleanPurple
-                      px-4 py-2 text-sm font-medium text-white
-                      transition-all duration-200
-                      hover:-translate-y-0.5 hover:shadow-lg
-                      active:translate-y-0
-                    "
-                    >
-                      Adicionar
-                    </button>
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        </main>
+                        <div className="mt-auto flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                          <p className="text-center font-bold text-texts sm:text-left">
+                            {currencyFormatter.format(product.price)}
+                          </p>
 
-        {/* ANIMAÇÕES */}
-        <style>{`
+                          <button
+                            type="button"
+                            onClick={() => handleAddCartItem(product)}
+                            aria-label={`Adicionar ${product.title} ao carrinho`}
+                            className="w-full rounded-xl bg-gradient-to-r from-purple to-cleanPurple px-3 py-2.5 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple sm:w-auto"
+                          >
+                            Adicionar
+                          </button>
+                        </div>
+                      </article>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+        </div>
+      </main>
+
+      <style>{`
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -280,15 +258,14 @@ export function Home() {
             animation: none;
           }
 
-          *,
-          *::before,
-          *::after {
+          .product-card *,
+          .product-card *::before,
+          .product-card *::after {
             scroll-behavior: auto !important;
             transition-duration: 0.01ms !important;
           }
         }
       `}</style>
-      </div>
     </>
   );
 }
