@@ -101,7 +101,7 @@ export function Home() {
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <section
             aria-labelledby="home-title"
-            className="relative mb-10 overflow-hidden rounded-3xl bg-gradient-to-r from-purple to-cleanPurple px-6 py-10 text-white shadow-xl sm:px-10 sm:py-14"
+            className="relative mb-10 overflow-hidden rounded-3xl bg-gradient-to-r from-purple to-cleanPurple px-6 py-6 text-white shadow-xl sm:px-8 sm:py-8"
           >
             <div
               aria-hidden="true"
@@ -149,7 +149,7 @@ export function Home() {
                   id="popular-title"
                   className="mt-1 text-2xl font-extrabold text-texts sm:text-3xl"
                 >
-                  Mangás mais populares
+                  Veja os mais populares
                 </h2>
               </div>
             </header>
@@ -177,14 +177,14 @@ export function Home() {
                     >
                       <article
                         aria-labelledby={`product-title-${product.id}`}
-                        className="flex h-full flex-col rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-4"
+                        className="flex h-full flex-col rounded-xl border border-slate-200/80 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-4 hover:shadow-purple hover:border-none"
                       >
                         <Link
                           to={`/product/${product.id}`}
                           onClick={scrollToTop}
                           className="group rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple"
                         >
-                          <div className="relative flex aspect-[3/4] max-h-72 items-center justify-center overflow-hidden rounded-xl bg-slate-100 p-3 sm:p-4">
+                          <div className="relative flex aspect-[3/4] max-h-72 items-center justify-center overflow-hidden rounded-xl mx-auto p-2">
                             {!imageLoaded && (
                               <div
                                 aria-hidden="true"
@@ -212,7 +212,7 @@ export function Home() {
                           </h3>
                         </Link>
 
-                        <div className="mt-auto flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="mt-auto flex md:flex-col gap-2 pt-4 sm:flex-row  sm:justify-between min-w-full ">
                           <p className="text-center font-bold text-texts sm:text-left">
                             {currencyFormatter.format(product.price)}
                           </p>
@@ -221,7 +221,7 @@ export function Home() {
                             type="button"
                             onClick={() => handleAddCartItem(product)}
                             aria-label={`Adicionar ${product.title} ao carrinho`}
-                            className="w-full rounded-xl bg-gradient-to-r from-purple to-cleanPurple px-3 py-2.5 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple sm:w-auto"
+                            className="min-w-full rounded-xl bg-gradient-to-r from-purple to-cleanPurple px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple sm:w-auto"
                           >
                             Adicionar
                           </button>

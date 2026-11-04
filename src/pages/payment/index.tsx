@@ -206,11 +206,11 @@ function Payment() {
                     </div>
 
                     <p className="font-semibold text-neutral-500">
-                      Cartão
+                      Cartão Débito/Crédito
                     </p>
 
-                    <p className="mt-1 text-xs text-neutral-400">
-                      Indisponível
+                    <p className="mt-1 text-xs text-red">
+                      Indisponível no momento
                     </p>
                   </div>
                 </div>

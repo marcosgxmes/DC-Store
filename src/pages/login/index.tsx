@@ -1,13 +1,14 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import logoImg from "../../../public/dc_circle_purple.png";
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Input } from "../../components/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Container } from "../../components/container";
+import { ForgotPasswordModal } from "../../components/forgotPasswordModal";
 
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "../../services/api";
@@ -33,6 +34,18 @@ export function Login() {
 	});
 
 	const navigate = useNavigate();
+	const [searchParams, setSearchParams] = useSearchParams();
+
+	// Quando o usuário clica no link do email, o Firebase abre a página de login
+	// com ?mode=resetPassword&oobCode=XXXX. Usamos o código para abrir o modal já na etapa 2.
+	const resetCodeFromUrl =
+		searchParams.get("mode") === "resetPassword"
+			? searchParams.get("oobCode")
+			: null;
+
+	const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState<boolean>(
+		Boolean(resetCodeFromUrl),
+	);
 
 	useEffect(() => {
 		async function handleLogout() {
@@ -41,6 +54,12 @@ export function Login() {
 
 		handleLogout();
 	}, []);
+
+	// Fecha o modal e limpa os parâmetros do link do email da URL
+	const handleCloseForgotPassword = useCallback(() => {
+		setIsForgotPasswordOpen(false);
+		setSearchParams({}, { replace: true });
+	}, [setSearchParams]);
 
 	function onSubmit(data: FormData) {
 		console.log(data);
@@ -107,7 +126,12 @@ export function Login() {
 							Entrar
 						</button>
 
-						<button className="bg-gradient-to-t from-purple to-cleanPurple hover:bg-none hover:bg-purple rounded-2xl w-full text-white h-10 font-medium">
+						{/* type="button" evita que o clique envie o formulário de login */}
+						<button
+							type="button"
+							onClick={() => setIsForgotPasswordOpen(true)}
+							className="bg-gradient-to-t from-purple to-cleanPurple hover:bg-none hover:bg-purple rounded-2xl w-full text-white h-10 font-medium"
+						>
 							Esqueci minha senha
 						</button>
 					</form>
@@ -118,6 +142,12 @@ export function Login() {
 					</Link>
 				</main>
 			</div>
+
+			<ForgotPasswordModal
+				isOpen={isForgotPasswordOpen}
+				onClose={handleCloseForgotPassword}
+				initialCode={resetCodeFromUrl ?? undefined}
+			/>
 		</Container>
 	);
 }
