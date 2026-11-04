@@ -10,7 +10,6 @@ import { IoClose } from "react-icons/io5";
 
 import { Input } from "../input";
 import { auth } from "../../services/api";
-import logoImg from "../../../public/dc_circle_purple.png";
 import { useCooldown } from "./useCooldown";
 import {
   RESEND_COOLDOWN_SECONDS,
@@ -101,11 +100,7 @@ const LINK_BUTTON_CLASS =
 function ModalHeader({ icon, title, description }: ModalHeaderProps) {
   return (
     <div className="flex flex-col items-center text-center">
-      <img
-        src={logoImg}
-        alt="Logo do site"
-        className="mb-4 w-full max-w-[110px] object-contain"
-      />
+      
 
       <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-purple/10 text-purple">
         {icon}

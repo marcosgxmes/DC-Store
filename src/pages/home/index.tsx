@@ -212,8 +212,8 @@ export function Home() {
                           </h3>
                         </Link>
 
-                        <div className="mt-auto flex md:flex-col gap-2 pt-4 sm:flex-row  sm:justify-between min-w-full ">
-                          <p className="text-center font-bold text-texts sm:text-left">
+                        <div className="mt-auto flex  gap-2 pt-4 flex-col md:flex-row sm:justify-between items-center w-full ">
+                          <p className="flex-1 md:text-center font-bold text-texts sm:text-left">
                             {currencyFormatter.format(product.price)}
                           </p>
 
@@ -221,7 +221,7 @@ export function Home() {
                             type="button"
                             onClick={() => handleAddCartItem(product)}
                             aria-label={`Adicionar ${product.title} ao carrinho`}
-                            className="min-w-full rounded-xl bg-gradient-to-r from-purple to-cleanPurple px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple sm:w-auto"
+                            className=" flex-1 w-full rounded-xl bg-gradient-to-r from-purple to-cleanPurple px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple sm:w-auto"
                           >
                             Adicionar
                           </button>
